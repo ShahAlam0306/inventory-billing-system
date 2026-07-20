@@ -22,7 +22,19 @@ from models import db, User, Product, Bill, BillItem, Category
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+with app.app_context():
+    db.create_all()
 
+    if not User.query.filter_by(username="admin").first():
+        admin = User(
+            name="Admin",
+            username="admin",
+            password_hash=generate_password_hash("admin123"),
+            role="admin",
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin user created")
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
