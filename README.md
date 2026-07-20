@@ -1,104 +1,310 @@
-# Inventory & Billing Software for Local Shops
+# 🛒 Inventory & Billing Management System
 
-Flask + MySQL starter project.
+A modern Inventory & Billing Management System built using **Flask**, **PostgreSQL**, and **Bootstrap**. This application helps grocery stores, retail shops, and small businesses manage inventory, generate bills, track sales, and monitor stock levels through an easy-to-use dashboard.
 
-## Project structure
+---
+
+## ✨ Features
+
+- 🔐 Secure Login Authentication
+- 📦 Inventory Management (Add, Edit, Delete Products)
+- 🏷️ Product Categories
+- 💰 Billing / Point of Sale (POS)
+- 📉 Automatic Stock Deduction
+- 📊 Dashboard Analytics
+- ⚠️ Low Stock Alerts
+- 🧾 Sales History
+- 🖨️ PDF Invoice Generation
+- 📱 Responsive User Interface
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+- Python 3
+- Flask
+- SQLAlchemy
+- PostgreSQL
+
+### Frontend
+- HTML5
+- CSS3
+- Bootstrap 5
+- JavaScript
+- Chart.js
+
+### Libraries
+- Flask-Login
+- ReportLab
+- Gunicorn
+- Python Dotenv
+
+---
+
+## 📂 Project Structure
+
 ```
-inventory_billing/
-├── app.py              # routes: auth, inventory, billing, dashboard
-├── models.py            # User, Product, Bill, BillItem
-├── config.py             # DB connection config
+inventory-billing-system/
+│
+├── app.py
+├── models.py
+├── config.py
 ├── requirements.txt
-├── templates/            # Jinja2 + Bootstrap templates
-└── static/css/style.css
+├── README.md
+├── .gitignore
+│
+├── templates/
+│   ├── base.html
+│   ├── login.html
+│   ├── dashboard.html
+│   ├── inventory.html
+│   ├── billing.html
+│   ├── bills.html
+│   ├── bill_detail.html
+│   └── invoice_pdf.html
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       ├── billing.js
+│       └── dashboard.js
+│
+└── screenshots/
 ```
 
-## Setup (each team member runs this once)
+---
 
-1. **Make sure PostgreSQL is installed and running** on your machine (you can check with `psql --version`). On Windows, the PostgreSQL installer includes a tool called **pgAdmin** — a GUI you can use instead of the command line for the next step if you prefer.
+# 🚀 Installation
 
-2. **Create the database.** Open a terminal and run:
-   ```bash
-   psql -U postgres
-   ```
-   It'll ask for the password you set when installing PostgreSQL. Once you're in the `postgres=#` prompt, run:
-   ```sql
-   CREATE DATABASE inventory_billing_db;
-   \q
-   ```
-   (`\q` quits back to your normal terminal.) If you prefer a GUI, you can instead open pgAdmin, right-click "Databases" → Create → Database, and name it `inventory_billing_db`.
+## 1. Clone the repository
 
-3. **Create a virtual environment and install dependencies:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate    
-  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+```bash
+git clone https://github.com/YOUR_USERNAME/inventory-billing-system.git
 
-4. **Set your DB connection.** Open `config.py` and replace `password` with your actual PostgreSQL password (the same one you used in step 2):
-   ```python
-   SQLALCHEMY_DATABASE_URI = os.environ.get(
-       "DATABASE_URL",
-       "postgresql+psycopg2://postgres:YOUR_PASSWORD_HERE@localhost/inventory_billing_db"
-   )
-   ```
-   Every team member edits this to match their own local PostgreSQL password — this file is just for local dev, so it's fine if everyone's is slightly different.
+cd inventory-billing-system
+```
 
-5. **Create tables + a default admin user:**
-   ```bash
-   flask --app app seed
-   ```
-   This prints login credentials: `admin` / `admin123` — change this before your final demo.
+---
 
-6. **Run the app:**
-   ```bash
-   flask --app app run --debug
-   ```
-   Visit http://127.0.0.1:5000
+## 2. Create Virtual Environment
 
-## Deploying online (so anyone with a link can use it)
+### Windows
 
-We'll use [Render](https://render.com) — it has a free tier for both the web app and a small PostgreSQL database, no credit card needed.
+```bash
+python -m venv venv
 
-1. **Push this project to GitHub** (create a new repo, upload all these files — an empty `venv` folder should NOT be uploaded, only the code).
+venv\Scripts\activate
+```
 
-2. **Create the database on Render:**
-   - Sign up at render.com, click **New → PostgreSQL**
-   - Give it a name (e.g. `inventory-billing-db`), choose the free plan, click **Create Database**
-   - Once created, copy the **Internal Database URL** shown on its page — you'll need it next
+### Linux / Mac
 
-3. **Create the web service:**
-   - Click **New → Web Service**, connect your GitHub repo
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn app:app`
-   - Under **Environment Variables**, add:
-     - `DATABASE_URL` = (paste the Internal Database URL from step 2)
-     - `SECRET_KEY` = any random string (e.g. `my-super-secret-key-123`)
-   - Click **Create Web Service**
+```bash
+python3 -m venv venv
 
-4. **Create the tables on the live database:**
-   - Once deployed, open the **Shell** tab on your web service in Render's dashboard
-   - Run: `flask --app app seed`
-   - This creates your tables and the default admin login on the live database
+source venv/bin/activate
+```
 
-5. **Done.** Render gives you a public URL like `https://inventory-billing.onrender.com` — share that link with anyone, including your friend, and they can use the app directly in their browser. No setup needed on their end.
+---
 
-**Note:** Render's free tier "spins down" the app after 15 minutes of inactivity — the first visit after a break takes ~30 seconds to wake up. This is normal and fine for a demo/viva.
+## 3. Install Dependencies
 
-- Login/logout with hashed passwords (Flask-Login)
-- Inventory CRUD (add/edit/delete products, low-stock highlighting)
-- Billing/POS screen — add products to a cart, checkout deducts stock automatically
-- Sales history + individual bill/invoice view
-- Dashboard with today's totals, low-stock alerts, and a 7-day sales chart (Chart.js)
+```bash
+pip install -r requirements.txt
+```
 
-## Suggested next steps for your team
-- Add role-based permissions (only admin can delete products / see all cashiers' sales)
-- Add PDF invoice download using WeasyPrint (render `bill_detail.html` to PDF)
-- Add a signup/user-management page for admins to create cashier accounts
-- Add product search/barcode field on the billing screen
-- Write a few unit tests (e.g. checkout fails correctly when stock is insufficient)
+---
 
-## Notes
-- Passwords are hashed with Werkzeug's `generate_password_hash` — never store plain text.
-- Stock deduction and bill creation happen in a single DB transaction (see `checkout()` in `app.py`) — if anything fails, nothing is saved, so stock numbers can't go wrong.
+## 4. Create PostgreSQL Database
+
+```sql
+CREATE DATABASE inventory_billing_db;
+```
+
+---
+
+## 5. Configure Database
+
+Open **config.py** and update your local PostgreSQL password.
+
+```python
+SQLALCHEMY_DATABASE_URI = os.environ.get(
+    "DATABASE_URL",
+    "postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost/inventory_billing_db"
+)
+```
+
+---
+
+## 6. Initialize Database
+
+```bash
+flask --app app seed
+```
+
+This creates:
+
+- Database Tables
+- Default Admin Account
+
+---
+
+## 7. Run the Application
+
+```bash
+flask --app app run
+```
+
+Open:
+
+```
+http://127.0.0.1:5000
+```
+
+---
+
+# 👤 Default Login
+
+Username
+
+```
+admin
+```
+
+Password
+
+```
+admin123
+```
+
+**Change the password before deploying to production.**
+
+---
+
+# 📈 Dashboard
+
+The dashboard provides:
+
+- Today's Sales
+- Bills Generated
+- Total Revenue
+- Low Stock Products
+- Sales Charts
+- Weekly & Monthly Analytics
+
+---
+
+# 🧾 Billing
+
+The billing module supports:
+
+- Add products to cart
+- Quantity management
+- Automatic stock deduction
+- Bill generation
+- PDF Invoice generation
+
+---
+
+# 📦 Inventory
+
+Manage products with:
+
+- Product Name
+- Category
+- Price
+- Stock Quantity
+- Reorder Level
+
+Products with low stock are automatically highlighted.
+
+---
+
+# ☁️ Deployment (Render)
+
+## Build Command
+
+```bash
+pip install -r requirements.txt
+```
+
+## Start Command
+
+```bash
+gunicorn app:app
+```
+
+## Environment Variables
+
+```
+DATABASE_URL=<Render PostgreSQL URL>
+
+SECRET_KEY=<Your Secret Key>
+```
+
+After deployment:
+
+```bash
+flask --app app seed
+```
+
+---
+
+# 📸 Screenshots
+
+Add screenshots inside:
+
+```
+screenshots/
+```
+
+Example:
+
+```
+screenshots/
+│
+├── login.png
+├── dashboard.png
+├── inventory.png
+├── billing.png
+├── invoice.png
+```
+
+---
+
+# 🔮 Future Improvements
+
+- Barcode Scanner
+- Customer Management
+- Supplier Management
+- Excel Export
+- Sales Reports
+- User Roles
+- Purchase Management
+- GST Support
+- Backup & Restore
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+**Shahalam Rayeen**
+
+GitHub
+
+https://github.com/ShahAlam0306
+
+LinkedIn
+
+https://www.linkedin.com/in/shahalam-rayeen-104435319
+
+Portfolio
+
+https://shahalam-portfolio.vercel.app
