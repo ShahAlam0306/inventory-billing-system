@@ -1,0 +1,145 @@
+/* S.S.A. General Store — theme */
+
+body {
+  background-color: #faf6f0;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Navbar — warm terracotta instead of default dark, feels more "shop" than "tech" */
+.navbar {
+  background-color: #7a3b2e !important;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.3px;
+}
+
+.navbar-brand::before {
+  content: "🛒 ";
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.card-body h3 {
+  font-weight: 700;
+}
+
+/* Dashboard summary cards — override Bootstrap's default blue/green/gray with warmer shop tones */
+.text-bg-primary {
+  background-color: #c1622d !important;
+}
+
+.text-bg-success {
+  background-color: #4a7c59 !important;
+}
+
+.text-bg-danger {
+  background-color: #b3452c !important;
+}
+
+.text-bg-secondary {
+  background-color: #8a8478 !important;
+}
+
+/* Tables */
+.table {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #f4ece3;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #7a3b2e;
+  border-bottom: 2px solid #e9ddd0;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #fdf3e9;
+}
+
+/* Low-stock row highlight */
+.table-warning {
+  --bs-table-bg: #fff3d6;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+}
+
+.btn-primary {
+  background-color: #c1622d;
+  border-color: #c1622d;
+}
+
+.btn-primary:hover {
+  background-color: #a54f22;
+  border-color: #a54f22;
+}
+
+.btn-success {
+  background-color: #4a7c59;
+  border-color: #4a7c59;
+  font-weight: 600;
+}
+
+.btn-success:hover {
+  background-color: #3a6347;
+  border-color: #3a6347;
+}
+
+.btn-outline-primary {
+  color: #c1622d;
+  border-color: #c1622d;
+}
+
+.btn-outline-primary:hover {
+  background-color: #c1622d;
+  border-color: #c1622d;
+}
+
+/* Billing page: cart total emphasis */
+#cartTotal {
+  font-weight: 700;
+  color: #7a3b2e;
+}
+
+/* Login card */
+.card.shadow-sm {
+  border-radius: 14px;
+  border-top: 4px solid #c1622d;
+}
+
+.card-title {
+  color: #7a3b2e;
+  font-weight: 700;
+}
+#salesChart{
+    width:100% !important;
+    height:100% !important;
+}
+
+.card-header{
+    font-weight:600;
+}
+
+.card{
+    overflow:hidden;
+}

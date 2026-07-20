@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Billing{% endblock %}
+{% block content %}
+
+<div id="billingRoot" data-checkout-url="{{ url_for('checkout') }}">
+<div class="row">
+  <div class="col-md-7">
+    <h5>Products</h5>
+    <input id="search" class="form-control mb-2" placeholder="Search product...">
+    <table class="table table-sm table-hover">
+      <thead><tr><th>Name</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+      <tbody id="productTable">
+        {% for p in products %}
+        <tr data-name="{{ p.name|lower }}">
+          <td>{{ p.name }}</td>
+          <td>₹{{ "%.2f"|format(p.price) }}</td>
+          <td>{{ p.stock_qty }}</td>
+          <td><button class="btn btn-sm btn-outline-primary" onclick="addToCart({{ p.id }}, '{{ p.name }}', {{ p.price }}, {{ p.stock_qty }})">Add</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-5">
+    <h5>Cart</h5>
+    <table class="table table-sm">
+      <thead><tr><th>Item</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody id="cartTable"></tbody>
+    </table>
+    <h4 class="text-end">Total: ₹<span id="cartTotal">0.00</span></h4>
+    <button class="btn btn-success w-100" onclick="checkout()">Generate Bill</button>
+    <div id="checkoutMsg" class="mt-2"></div>
+  </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/billing.js') }}"></script>
+{% endblock %}

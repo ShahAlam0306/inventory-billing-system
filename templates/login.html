@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+  body { background-color: #faf6f0; }
+
+  .login-wrap {
+    display: flex;
+    justify-content: center;
+    padding-top: 3.5rem;
+  }
+
+  .login-card {
+    display: flex;
+    width: 100%;
+    max-width: 780px;
+    min-height: 460px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(58, 30, 20, 0.18);
+  }
+
+  /* ---------- Left panel: hanging signboard ---------- */
+  .signboard-panel {
+    flex: 1 1 44%;
+    position: relative;
+    background-color: #5c2c22;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 2px, transparent 2px, transparent 14px);
+    padding: 2.6rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #f4ece3;
+  }
+
+  .signboard-panel::before,
+  .signboard-panel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 34px;
+    background: rgba(244,236,227,0.55);
+  }
+  .signboard-panel::before { left: 32%; transform: rotate(4deg); }
+  .signboard-panel::after  { right: 32%; transform: rotate(-4deg); }
+
+  .signboard {
+    border: 2px solid rgba(244,236,227,0.5);
+    border-radius: 10px;
+    padding: 1.6rem 1.4rem;
+    margin-top: 20px;
+    background: rgba(0,0,0,0.08);
+  }
+
+  .signboard .cart {
+    font-size: 1.6rem;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .signboard h1 {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: 1.9rem;
+    line-height: 1.15;
+    margin: 0 0 0.35rem;
+    color: #fff;
+  }
+
+  .signboard p {
+    font-family: 'Nunito', sans-serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #e5d3c3;
+    margin: 0;
+  }
+
+  .open-tag {
+    margin-top: 1.4rem;
+    display: inline-block;
+    background: #d9a544;
+    color: #4a2c14;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 3px;
+    transform: rotate(-2deg);
+  }
+
+  .produce-strip {
+    margin-top: 1.8rem;
+    font-size: 1.1rem;
+    opacity: 0.7;
+    letter-spacing: 6px;
+  }
+
+  /* ---------- Right panel: ledger-style form ---------- */
+  .form-panel {
+    flex: 1 1 56%;
+    background: #fffdfb;
+    padding: 3rem 2.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .eyebrow {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #c1622d;
+    margin-bottom: 0.3rem;
+  }
+
+  .form-panel h2 {
+    font-family: 'Kalam', cursive;
+    color: #5c2c22;
+    font-size: 1.7rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .ledger-field {
+    margin-bottom: 1.4rem;
+  }
+
+  .ledger-field label {
+    display: block;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: #8a6a56;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+
+  .ledger-field input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #e4d5c3;
+    background: transparent;
+    padding: 0.5rem 0.1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: #3c2a1e;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .ledger-field input:focus {
+    border-bottom-color: #c1622d;
+  }
+
+  .btn-login {
+    margin-top: 0.6rem;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    color: #fff;
+    background: linear-gradient(135deg, #c1622d, #a54f22);
+    box-shadow: 0 6px 14px rgba(165, 79, 34, 0.35);
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(165, 79, 34, 0.42);
+  }
+
+  @media (max-width: 700px) {
+    .login-card { flex-direction: column; min-height: 0; }
+    .signboard-panel { padding: 2.2rem 1.6rem; }
+    .form-panel { padding: 2.2rem 1.8rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+
+    <div class="signboard-panel">
+      <div class="signboard">
+        <span class="cart">🛒</span>
+        <h1>S.S.A.<br>General Store</h1>
+        <p>Fresh groceries, honest prices</p>
+      </div>
+      <span class="open-tag">Open · Billing Counter</span>
+      <div class="produce-strip">🍅 🥦 🍞 🥛 🧅</div>
+    </div>
+
+    <div class="form-panel">
+      <div class="eyebrow">Staff login</div>
+      <h2>Log in to the till</h2>
+
+      <form method="POST">
+        <div class="ledger-field">
+          <label>Username</label>
+          <input type="text" name="username" required autofocus>
+        </div>
+        <div class="ledger-field">
+          <label>Password</label>
+          <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn-login">Log In</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sales History{% endblock %}
+{% block content %}
+<h4 class="mb-3">Sales History</h4>
+<table class="table table-hover">
+  <thead><tr><th>Bill #</th><th>Date</th><th>Cashier</th><th>Total</th><th></th></tr></thead>
+  <tbody>
+    {% for b in bills %}
+    <tr>
+      <td>{{ b.id }}</td>
+      <td>{{ b.date.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ b.cashier.name if b.cashier else '-' }}</td>
+      <td>₹{{ "%.2f"|format(b.total_amount) }}</td>
+      <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('bill_detail', bill_id=b.id) }}">View</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

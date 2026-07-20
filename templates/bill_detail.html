@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Bill #{{ bill.id }}{% endblock %}
+
+{% block head %}
+<style>
+  .invoice-preview {
+    max-width: 560px;
+    margin: 1.5rem auto 0;
+    background: #fffdfb;
+    border: 1px solid #e9ddd0;
+    border-radius: 12px;
+    padding: 2rem 2.2rem;
+    box-shadow: 0 4px 16px rgba(58,30,20,0.08);
+  }
+  .invoice-preview .inv-header {
+    text-align: center;
+    border-bottom: 2px solid #7a3b2e;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .invoice-preview .inv-shop {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #7a3b2e;
+  }
+  .invoice-preview .inv-tagline {
+    font-size: 0.75rem;
+    color: #999;
+  }
+  .invoice-preview .inv-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: #666;
+    margin-bottom: 14px;
+  }
+  .invoice-preview table {
+    width: 100%;
+    font-size: 0.88rem;
+    border-collapse: collapse;
+  }
+  .invoice-preview th {
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #7a3b2e;
+    background: #f4ece3;
+    padding: 6px 8px;
+  }
+  .invoice-preview th.num, .invoice-preview td.num {
+    text-align: right;
+  }
+  .invoice-preview td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f0e8de;
+  }
+  .invoice-preview .inv-total-row td {
+    border-top: 2px solid #7a3b2e;
+    border-bottom: none;
+    font-weight: 700;
+    padding-top: 10px;
+  }
+  .invoice-preview .inv-footer {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #999;
+    margin-top: 20px;
+  }
+  .preview-label {
+    text-align: center;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #b3a494;
+    margin-top: 1.8rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-2">
+  <div>
+    <h4>Bill #{{ bill.id }}</h4>
+    <p class="text-muted">{{ bill.date.strftime('%Y-%m-%d %H:%M') }} — Cashier: {{ bill.cashier.name if bill.cashier else '-' }}</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('bill_pdf', bill_id=bill.id) }}">
+    ⬇ Download Invoice
+  </a>
+</div>
+
+<table class="table">
+  <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+  <tbody>
+    {% for item in bill.items %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td>{{ item.qty }}</td>
+      <td>₹{{ "%.2f"|format(item.price_at_sale) }}</td>
+      <td>₹{{ "%.2f"|format(item.subtotal) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<h5 class="text-end">Total: ₹{{ "%.2f"|format(bill.total_amount) }}</h5>
+
+<div class="preview-label">Invoice preview</div>
+<div class="invoice-preview">
+  <div class="inv-header">
+    <div class="inv-shop">🛒 S.S.A. General Store</div>
+    <div class="inv-tagline">Your neighbourhood shop, done digitally</div>
+  </div>
+  <div class="inv-meta">
+    <span>Bill #{{ bill.id }}</span>
+    <span>{{ bill.date.strftime('%d %b %Y, %I:%M %p') }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th class="num">Qty</th>
+        <th class="num">Price</th>
+        <th class="num">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in bill.items %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td class="num">{{ item.qty }}</td>
+        <td class="num">₹{{ "%.2f"|format(item.price_at_sale) }}</td>
+        <td class="num">₹{{ "%.2f"|format(item.subtotal) }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="inv-total-row">
+        <td colspan="3">Total</td>
+        <td class="num">₹{{ "%.2f"|format(bill.total_amount) }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="inv-footer">Thank you for shopping with us!</div>
+</div>
+
+{% endblock %}
