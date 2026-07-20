@@ -183,7 +183,6 @@ admin123
 ---
 
 # 📈 Dashboard
-
 The dashboard provides:
 
 - Today's Sales
@@ -193,10 +192,7 @@ The dashboard provides:
 - Sales Charts
 - Weekly & Monthly Analytics
 
----
-
 # 🧾 Billing
-
 The billing module supports:
 
 - Add products to cart
@@ -208,7 +204,6 @@ The billing module supports:
 ---
 
 # 📦 Inventory
-
 Manage products with:
 
 - Product Name
@@ -254,6 +249,11 @@ flask --app app seed
 # 📸 Screenshots
 
 Add screenshots inside:
+<img width="623" height="367" alt="image" src="https://github.com/user-attachments/assets/3a11a267-5244-4794-9a02-94802cd2ed09" />
+<img width="398" height="423" alt="image" src="https://github.com/user-attachments/assets/30357814-b248-445b-9702-803aab2f8d2c" />
+<img width="1365" height="285" alt="image" src="https://github.com/user-attachments/assets/bf17bb5a-3337-403a-b102-9a127494db90" />
+<img width="1039" height="497" alt="image" src="https://github.com/user-attachments/assets/739aed00-813b-4b9f-a227-bf8164efd914" />
+<img width="1354" height="639" alt="image" src="https://github.com/user-attachments/assets/a3606598-18ea-49cb-b2e0-e441346081a2" />
 
 ```
 screenshots/
@@ -273,18 +273,6 @@ screenshots/
 
 ---
 
-# 🔮 Future Improvements
-
-- Barcode Scanner
-- Customer Management
-- Supplier Management
-- Excel Export
-- Sales Reports
-- User Roles
-- Purchase Management
-- GST Support
-- Backup & Restore
-
 ---
 
 # 📄 License
@@ -301,10 +289,3 @@ GitHub
 
 https://github.com/ShahAlam0306
 
-LinkedIn
-
-https://www.linkedin.com/in/shahalam-rayeen-104435319
-
-Portfolio
-
-https://shahalam-portfolio.vercel.app
