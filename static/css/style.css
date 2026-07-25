@@ -143,3 +143,85 @@ body {
 .card{
     overflow:hidden;
 }
+
+/* ---------- Mobile fixes ---------- */
+@media (max-width: 575.98px) {
+
+  /* Card headers with a title + button (Low Stock, Best Seller, Sales Analytics,
+     Recent Bills) were overflowing/squeezing on narrow screens. Let them wrap
+     and shrink the button text a touch instead of crushing the title. */
+  .card-header.d-flex {
+    flex-wrap: wrap;
+    row-gap: 0.4rem;
+  }
+  .card-header .btn-group {
+    width: 100%;
+  }
+  .card-header .btn-group .btn {
+    flex: 1 1 auto;
+    font-size: 0.78rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  /* Stat cards read cramped at half-width with large numbers — scale them down */
+  .card-body h6 {
+    font-size: 0.82rem;
+  }
+  .card-body h3 {
+    font-size: 1.4rem;
+  }
+  .card-body h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Tables: smaller text + tighter padding so more columns fit before scrolling */
+  .table {
+    font-size: 0.82rem;
+  }
+  .table td, .table th {
+    padding: 0.5rem 0.4rem;
+  }
+
+  /* Reduce the page container's side margin so content isn't squeezed by
+     Bootstrap's default gutters on very narrow screens */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Invoice preview box on the bill detail page had desktop-sized padding */
+  .invoice-preview {
+    padding: 1.2rem 1rem;
+  }
+
+  .chart-wrap {
+    height: 240px !important;
+  }
+}
+
+/* ---------- Billing / POS screen ---------- */
+/* On phones the product list and cart stack (Bootstrap default), but the cart
+   total + checkout button should stay visible without scrolling back up, and
+   tap targets need to be big enough for a thumb. */
+@media (max-width: 767.98px) {
+  #billingRoot .btn-sm {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.85rem;
+  }
+
+  #billingRoot .col-md-5 {
+    position: sticky;
+    bottom: 0;
+    background: #faf6f0;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+    border-top: 2px solid #e9ddd0;
+    z-index: 5;
+  }
+
+  #billingRoot .cart-scroll {
+    max-height: 32vh;
+    overflow-y: auto;
+  }
+}
