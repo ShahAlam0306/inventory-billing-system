@@ -7,6 +7,7 @@
   <div class="col-md-7">
     <h5>Products</h5>
     <input id="search" class="form-control mb-2" placeholder="Search product...">
+    <div class="table-responsive">
     <table class="table table-sm table-hover">
       <thead><tr><th>Name</th><th>Price</th><th>Stock</th><th></th></tr></thead>
       <tbody id="productTable">
@@ -20,14 +21,17 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 
   <div class="col-md-5">
     <h5>Cart</h5>
+    <div class="cart-scroll table-responsive">
     <table class="table table-sm">
       <thead><tr><th>Item</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
       <tbody id="cartTable"></tbody>
     </table>
+    </div>
     <h4 class="text-end">Total: ₹<span id="cartTotal">0.00</span></h4>
     <button class="btn btn-success w-100" onclick="checkout()">Generate Bill</button>
     <div id="checkoutMsg" class="mt-2"></div>
