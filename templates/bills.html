@@ -2,6 +2,7 @@
 {% block title %}Sales History{% endblock %}
 {% block content %}
 <h4 class="mb-3">Sales History</h4>
+<div class="table-responsive">
 <table class="table table-hover">
   <thead><tr><th>Bill #</th><th>Date</th><th>Cashier</th><th>Total</th><th></th></tr></thead>
   <tbody>
@@ -16,4 +17,5 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% endblock %}
