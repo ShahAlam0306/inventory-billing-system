@@ -92,4 +92,4 @@ if (dashboardRoot) {
 
     loadChart("daily");
 
-}
+}    
