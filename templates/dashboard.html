@@ -6,7 +6,8 @@
 <div id="dashboardRoot"
      data-sales-url-daily="{{ url_for('sales_last_7_days') }}"
      data-sales-url-weekly="{{ url_for('sales_weekly') }}"
-     data-sales-url-monthly="{{ url_for('sales_monthly') }}">
+     data-sales-url-monthly="{{ url_for('sales_monthly') }}"
+     data-sales-url-category="{{ url_for('sales_by_category') }}">
 
    <!-- Statistics Cards -->
 
@@ -113,7 +114,7 @@
     <div class="col-6 col-md-4">
         <div class="card border-success shadow-sm h-100">
             <div class="card-body text-center">
-                <h6 class="text-muted">💵 Total Revenue</h6>
+                <h6 class="text-muted">💵 {% if is_admin %}Total Revenue{% else %}My Revenue{% endif %}</h6>
                 <h2 class="text-success">
                     ₹{{ "%.2f"|format(total_revenue) }}
                 </h2>
@@ -139,7 +140,7 @@
 
             <div class="card-header d-flex justify-content-between align-items-center">
 
-                <strong>🏆 Best Selling Product</strong>
+                <strong>🏆 {% if is_admin %}Best Selling Product{% else %}My Best Seller{% endif %}</strong>
 
                 <button class="btn btn-sm btn-outline-warning"
                         type="button"
@@ -181,48 +182,72 @@
     </div>
 
 </div>
- <!-- Sales Chart -->
+ <!-- Sales Chart + Category Breakdown -->
 
-<div class="card shadow-sm mb-4">
+<div class="row g-3 mb-4">
 
-    <div class="card-header d-flex justify-content-between align-items-center">
+  <div class="col-lg-7">
+    <div class="card shadow-sm h-100">
 
-        <strong>📊 Sales Analytics</strong>
+        <div class="card-header d-flex justify-content-between align-items-center">
 
-        <div class="btn-group">
+            <strong>📊 Sales Analytics</strong>
 
-            <button class="btn btn-outline-primary btn-sm active"
-                    data-period="daily">
+            <div class="btn-group">
 
-                Daily
+                <button class="btn btn-outline-primary btn-sm active"
+                        data-period="daily">
 
-            </button>
+                    Daily
 
-            <button class="btn btn-outline-primary btn-sm"
-                    data-period="weekly">
+                </button>
 
-                Weekly
+                <button class="btn btn-outline-primary btn-sm"
+                        data-period="weekly">
 
-            </button>
+                    Weekly
 
-            <button class="btn btn-outline-primary btn-sm"
-                    data-period="monthly">
+                </button>
 
-                Monthly
+                <button class="btn btn-outline-primary btn-sm"
+                        data-period="monthly">
 
-            </button>
+                    Monthly
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="chart-wrap" style="height:350px;">
+        <canvas id="salesChart"></canvas>
+    </div>
 
         </div>
 
     </div>
+  </div>
 
-    <div class="card-body">
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100">
 
-        <div class="chart-wrap" style="height:350px;">
-    <canvas id="salesChart"></canvas>
-</div>
+        <div class="card-header">
+            <strong>🥧 Sales by Category</strong>
+        </div>
+
+        <div class="card-body">
+
+            <div class="chart-wrap" style="height:350px;">
+        <canvas id="categoryChart"></canvas>
+    </div>
+
+        </div>
 
     </div>
+  </div>
 
 </div>
 
@@ -232,7 +257,7 @@
 
     <div class="card-header d-flex justify-content-between align-items-center">
 
-        <strong>🧾 Recent Bills</strong>
+        <strong>🧾 {% if is_admin %}Recent Bills{% else %}My Recent Bills{% endif %}</strong>
 
         <button class="btn btn-outline-success btn-sm"
                 data-bs-toggle="collapse"
