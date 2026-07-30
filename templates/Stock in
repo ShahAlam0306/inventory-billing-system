@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Stock In{% endblock %}
+{% block content %}
+
+<h4 class="mb-3">Stock In / Purchases</h4>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header">Record a purchase</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('stock_in') }}">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Product</label>
+            <select class="form-select" name="product_id" required>
+              <option value="" disabled selected>Choose a product…</option>
+              {% for p in products %}
+              <option value="{{ p.id }}">{{ p.name }} (current stock: {{ p.stock_qty }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label fw-semibold">Quantity received</label>
+              <input class="form-control" name="qty" type="number" min="1" placeholder="e.g. 50" required>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label fw-semibold">Cost price / unit (₹)</label>
+              <input class="form-control" name="cost_price" type="number" step="0.01" placeholder="What you paid" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Supplier <span class="text-muted fw-normal">(optional)</span></label>
+            <input class="form-control" name="supplier" placeholder="e.g. Shah Wholesale Traders">
+          </div>
+          <button class="btn btn-success w-100" type="submit">Add to Stock</button>
+        </form>
+      </div>
+    </div>
+    <p class="text-muted small mt-2">
+      Adding stock here updates the product's quantity and recalculates its average cost price automatically —
+      you don't need to edit the product separately.
+    </p>
+  </div>
+
+  <div class="col-lg-7">
+    <h6 class="mb-2">Recent purchases</h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr><th>Date</th><th>Product</th><th>Qty</th><th>Cost/unit</th><th>Supplier</th><th>By</th></tr>
+        </thead>
+        <tbody>
+          {% for h in history %}
+          <tr>
+            <td>{{ h.date.strftime('%d-%m-%Y') }}</td>
+            <td>{{ h.product.name if h.product else '-' }}</td>
+            <td>{{ h.qty }}</td>
+            <td>₹{{ "%.2f"|format(h.cost_price) }}</td>
+            <td>{{ h.supplier or '-' }}</td>
+            <td>{{ h.added_by.name if h.added_by else '-' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="text-center text-muted">No stock-in records yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
