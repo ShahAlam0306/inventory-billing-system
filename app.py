@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from io import BytesIO
+from functools import wraps
 import click
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response, send_file
 from flask_login import (
@@ -17,24 +18,12 @@ from reportlab.platypus import (
 )
 
 from config import Config
-from models import db, User, Product, Bill, BillItem, Category
+from models import db, User, Product, Bill, BillItem, Category, StockIn
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
-with app.app_context():
-    db.create_all()
 
-    if not User.query.filter_by(username="admin").first():
-        admin = User(
-            name="Admin",
-            username="admin",
-            password_hash=generate_password_hash("admin123"),
-            role="admin",
-        )
-        db.session.add(admin)
-        db.session.commit()
-        print("Admin user created")
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
@@ -42,6 +31,18 @@ login_manager.login_view = "login"
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+def admin_required(f):
+    """Use in place of @login_required on routes only admins may access."""
+    @wraps(f)
+    @login_required
+    def wrapper(*args, **kwargs):
+        if current_user.role != "admin":
+            flash("That action is restricted to admins.")
+            return redirect(url_for("dashboard"))
+        return f(*args, **kwargs)
+    return wrapper
 
 
 # ---------- Auth ----------
@@ -71,27 +72,43 @@ def logout():
 @app.route("/")
 @login_required
 def dashboard():
+    is_admin = current_user.role == "admin"
+
     low_stock = Product.query.filter(Product.stock_qty <= Product.reorder_level).all()
     today = datetime.utcnow().date()
-    today_bills = Bill.query.filter(db.func.date(Bill.date) == today).all()
+
+    # Cashiers only see their own bills/revenue; admins see everything.
+    bills_query = Bill.query if is_admin else Bill.query.filter_by(cashier_id=current_user.id)
+
+    today_bills = bills_query.filter(db.func.date(Bill.date) == today).all()
     today_total = sum(b.total_amount for b in today_bills)
 
     total_products = Product.query.count()
 
-    total_revenue = db.session.query(db.func.sum(Bill.total_amount)).scalar() or 0
-    total_bills_count = Bill.query.count()
+    total_revenue = db.session.query(db.func.sum(Bill.total_amount))
+    total_bills_count_q = Bill.query
+    if not is_admin:
+        total_revenue = total_revenue.filter(Bill.cashier_id == current_user.id)
+        total_bills_count_q = total_bills_count_q.filter(Bill.cashier_id == current_user.id)
+    total_revenue = total_revenue.scalar() or 0
+    total_bills_count = total_bills_count_q.count()
     average_bill = (total_revenue / total_bills_count) if total_bills_count else 0
 
-    best_product_row = (
+    best_product_q = (
         db.session.query(Product.name, db.func.sum(BillItem.qty).label("qty_sold"))
         .join(BillItem, BillItem.product_id == Product.id)
-        .group_by(Product.id, Product.name)
+        .join(Bill, Bill.id == BillItem.bill_id)
+    )
+    if not is_admin:
+        best_product_q = best_product_q.filter(Bill.cashier_id == current_user.id)
+    best_product_row = (
+        best_product_q.group_by(Product.id, Product.name)
         .order_by(db.desc("qty_sold"))
         .first()
     )
     best_product = {"name": best_product_row.name, "qty": best_product_row.qty_sold} if best_product_row else None
 
-    recent_bills = Bill.query.order_by(Bill.date.desc()).limit(5).all()
+    recent_bills = bills_query.order_by(Bill.date.desc()).limit(5).all()
 
     return render_template(
         "dashboard.html",
@@ -103,6 +120,7 @@ def dashboard():
         average_bill=average_bill,
         best_product=best_product,
         recent_bills=recent_bills,
+        is_admin=is_admin,
     )
 
 
@@ -113,11 +131,10 @@ def sales_last_7_days():
     data = []
     for i in range(6, -1, -1):
         day = datetime.utcnow().date() - timedelta(days=i)
-        total = (
-            db.session.query(db.func.sum(Bill.total_amount))
-            .filter(db.func.date(Bill.date) == day)
-            .scalar() or 0
-        )
+        q = db.session.query(db.func.sum(Bill.total_amount)).filter(db.func.date(Bill.date) == day)
+        if current_user.role != "admin":
+            q = q.filter(Bill.cashier_id == current_user.id)
+        total = q.scalar() or 0
         data.append({"day": day.strftime("%a"), "total": round(total, 2)})
     return jsonify(data)
 
@@ -132,11 +149,13 @@ def sales_weekly():
     for i in range(7, -1, -1):
         week_start = start_of_this_week - timedelta(weeks=i)
         week_end = week_start + timedelta(days=6)
-        total = (
+        q = (
             db.session.query(db.func.sum(Bill.total_amount))
             .filter(db.func.date(Bill.date) >= week_start, db.func.date(Bill.date) <= week_end)
-            .scalar() or 0
         )
+        if current_user.role != "admin":
+            q = q.filter(Bill.cashier_id == current_user.id)
+        total = q.scalar() or 0
         data.append({"day": week_start.strftime("%d %b"), "total": round(total, 2)})
     return jsonify(data)
 
@@ -162,13 +181,31 @@ def sales_monthly():
         start = datetime(y, m, 1).date()
         end = (datetime(y + 1, 1, 1).date() - timedelta(days=1)) if m == 12 \
             else (datetime(y, m + 1, 1).date() - timedelta(days=1))
-        total = (
+        q = (
             db.session.query(db.func.sum(Bill.total_amount))
             .filter(db.func.date(Bill.date) >= start, db.func.date(Bill.date) <= end)
-            .scalar() or 0
         )
+        if current_user.role != "admin":
+            q = q.filter(Bill.cashier_id == current_user.id)
+        total = q.scalar() or 0
         data.append({"day": start.strftime("%b %Y"), "total": round(total, 2)})
     return jsonify(data)
+
+
+@app.route("/api/sales-by-category")
+@login_required
+def sales_by_category():
+    """JSON feed for the dashboard's category-wise sales breakdown (doughnut chart)."""
+    q = (
+        db.session.query(Category.name, db.func.sum(BillItem.qty * BillItem.price_at_sale).label("total"))
+        .join(Product, Product.category_id == Category.id)
+        .join(BillItem, BillItem.product_id == Product.id)
+        .join(Bill, Bill.id == BillItem.bill_id)
+    )
+    if current_user.role != "admin":
+        q = q.filter(Bill.cashier_id == current_user.id)
+    rows = q.group_by(Category.id, Category.name).order_by(db.desc("total")).all()
+    return jsonify([{"category": r.name, "total": round(r.total or 0, 2)} for r in rows])
 
 
 # ---------- Inventory ----------
@@ -178,7 +215,12 @@ def sales_monthly():
 def inventory():
     products = Product.query.order_by(Product.name).all()
     categories = Category.query.order_by(Category.name).all()
-    return render_template("inventory.html", products=products, categories=categories)
+    return render_template(
+        "inventory.html",
+        products=products,
+        categories=categories,
+        is_admin=(current_user.role == "admin"),
+    )
 
 
 def _get_or_create_category(name):
@@ -236,7 +278,7 @@ def _validate_product_form(form):
 
 
 @app.route("/inventory/add", methods=["POST"])
-@login_required
+@admin_required
 def add_product():
     is_valid, error, data = _validate_product_form(request.form)
     if not is_valid:
@@ -252,7 +294,7 @@ def add_product():
 
 
 @app.route("/inventory/<int:product_id>/edit", methods=["POST"])
-@login_required
+@admin_required
 def edit_product(product_id):
     p = Product.query.get_or_404(product_id)
 
@@ -273,7 +315,7 @@ def edit_product(product_id):
 
 
 @app.route("/inventory/<int:product_id>/delete", methods=["POST"])
-@login_required
+@admin_required
 def delete_product(product_id):
     p = Product.query.get_or_404(product_id)
 
@@ -289,6 +331,63 @@ def delete_product(product_id):
 
     flash(f"Deleted {p.name}")
     return redirect(url_for("inventory"))
+
+
+# ---------- Stock-in / purchases ----------
+
+@app.route("/inventory/stock-in", methods=["GET", "POST"])
+@admin_required
+def stock_in():
+    if request.method == "POST":
+        product = Product.query.get(request.form.get("product_id"))
+        if not product:
+            flash("Please select a valid product.")
+            return redirect(url_for("stock_in"))
+
+        try:
+            qty = int(request.form.get("qty", ""))
+        except ValueError:
+            flash("Quantity must be a whole number.")
+            return redirect(url_for("stock_in"))
+        if qty <= 0:
+            flash("Quantity must be greater than zero.")
+            return redirect(url_for("stock_in"))
+
+        try:
+            cost_price = float(request.form.get("cost_price", ""))
+        except ValueError:
+            flash("Cost price must be a valid number.")
+            return redirect(url_for("stock_in"))
+        if cost_price < 0:
+            flash("Cost price cannot be negative.")
+            return redirect(url_for("stock_in"))
+
+        supplier = request.form.get("supplier", "").strip()
+
+        # Update the product's weighted-average cost price and stock level
+        old_qty = product.stock_qty or 0
+        old_cost = product.cost_price or 0
+        new_qty = old_qty + qty
+        product.cost_price = round(((old_qty * old_cost) + (qty * cost_price)) / new_qty, 2) if new_qty else cost_price
+        product.stock_qty = new_qty
+
+        entry = StockIn(
+            product_id=product.id,
+            qty=qty,
+            cost_price=cost_price,
+            supplier=supplier,
+            added_by_id=current_user.id,
+        )
+        db.session.add(entry)
+        db.session.commit()
+        flash(f"Added {qty} unit(s) of {product.name} to stock.")
+        return redirect(url_for("stock_in"))
+
+    products = Product.query.order_by(Product.name).all()
+    history = (
+        StockIn.query.order_by(StockIn.date.desc()).limit(50).all()
+    )
+    return render_template("stock_in.html", products=products, history=history)
 
 
 # ---------- Billing / POS ----------
@@ -340,7 +439,24 @@ def checkout():
 
     bill.total_amount = round(total, 2)
     db.session.commit()
-    return jsonify({"bill_id": bill.id, "total": bill.total_amount})
+
+    return jsonify({
+        "bill_id": bill.id,
+        "total": bill.total_amount,
+        "date": bill.date.strftime("%d %b %Y, %I:%M %p"),
+        "cashier": current_user.name,
+        "items": [
+            {
+                "name": item.product.name,
+                "qty": item.qty,
+                "price": item.price_at_sale,
+                "subtotal": item.subtotal,
+                "remaining_stock": item.product.stock_qty,
+            }
+            for item in bill.items
+        ],
+        "pdf_url": url_for("bill_pdf", bill_id=bill.id),
+    })
 
 
 # ---------- Sales history ----------
@@ -348,14 +464,28 @@ def checkout():
 @app.route("/bills")
 @login_required
 def bills():
-    all_bills = Bill.query.order_by(Bill.date.desc()).all()
-    return render_template("bills.html", bills=all_bills)
+    if current_user.role == "admin":
+        all_bills = Bill.query.order_by(Bill.date.desc()).all()
+    else:
+        all_bills = Bill.query.filter_by(cashier_id=current_user.id).order_by(Bill.date.desc()).all()
+    return render_template("bills.html", bills=all_bills, is_admin=(current_user.role == "admin"))
+
+
+def _get_bill_or_403(bill_id):
+    """Fetch a bill, but cashiers may only access their own — others get redirected."""
+    bill = Bill.query.get_or_404(bill_id)
+    if current_user.role != "admin" and bill.cashier_id != current_user.id:
+        flash("You can only view your own bills.")
+        return None
+    return bill
 
 
 @app.route("/bills/<int:bill_id>")
 @login_required
 def bill_detail(bill_id):
-    bill = Bill.query.get_or_404(bill_id)
+    bill = _get_bill_or_403(bill_id)
+    if bill is None:
+        return redirect(url_for("bills"))
     return render_template("bill_detail.html", bill=bill)
 
 
@@ -461,7 +591,9 @@ def _build_invoice_pdf(bill):
 @app.route("/bills/<int:bill_id>/pdf")
 @login_required
 def bill_pdf(bill_id):
-    bill = Bill.query.get_or_404(bill_id)
+    bill = _get_bill_or_403(bill_id)
+    if bill is None:
+        return redirect(url_for("bills"))
     buffer = _build_invoice_pdf(bill)
     return send_file(
         buffer,
