@@ -33,12 +33,29 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     price = db.Column(db.Float, nullable=False)
+    cost_price = db.Column(db.Float, default=0.0)  # weighted-average purchase cost, updated on stock-in
     stock_qty = db.Column(db.Integer, default=0)
     reorder_level = db.Column(db.Integer, default=10)
 
     @property
     def is_low_stock(self):
         return self.stock_qty <= self.reorder_level
+
+
+class StockIn(db.Model):
+    """A single restocking/purchase event for a product."""
+    __tablename__ = "stock_ins"
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
+    qty = db.Column(db.Integer, nullable=False)
+    cost_price = db.Column(db.Float, nullable=False)  # cost per unit for this purchase
+    supplier = db.Column(db.String(150))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    added_by_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+    product = db.relationship("Product")
+    added_by = db.relationship("User")
 
 
 class Bill(db.Model):
