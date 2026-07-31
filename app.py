@@ -26,15 +26,25 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-    if not User.query.filter_by(username="admin").first():
-        admin = User(
-            name="Admin",
-            username="admin",
-            password_hash=generate_password_hash("admin123"),
-            role="admin",
-        )
-        db.session.add(admin)
-        db.session.commit()
+    users = [
+        ("Admin", "admin", "admin123", "admin"),
+        ("Shahalam", "shahalam", "shahalam123", "admin"),
+        ("Sohail", "sohail", "sohail123", "cashier"),
+        ("Abhay", "abhay", "abhay123", "cashier"),
+    ]
+
+    for name, username, password, role in users:
+        if not User.query.filter_by(username=username).first():
+            db.session.add(
+                User(
+                    name=name,
+                    username=username,
+                    password_hash=generate_password_hash(password),
+                    role=role,
+                )
+            )
+
+    db.session.commit()
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
@@ -618,21 +628,48 @@ def bill_pdf(bill_id):
 
 @app.cli.command("seed")
 def seed():
-    """Run with: flask --app app seed  -- creates tables + a default admin user."""
     db.create_all()
-    if not User.query.filter_by(username="admin").first():
-        admin = User(
-            name="Admin",
-            username="admin",
-            password_hash=generate_password_hash("admin123"),
-            role="admin",
-        )
-        db.session.add(admin)
-        db.session.commit()
-        print("Created admin user -> username: admin | password: admin123")
-    else:
-        print("Admin user already exists")
 
+    users = [
+        {
+            "name": "Admin",
+            "username": "admin",
+            "password": "admin123",
+            "role": "admin",
+        },
+        {
+            "name": "Shahalam",
+            "username": "shahalam",
+            "password": "shahalam123",
+            "role": "admin",
+        },
+        {
+            "name": "Sohail",
+            "username": "sohail",
+            "password": "sohail123",
+            "role": "cashier",
+        },
+        {
+            "name": "Abhay",
+            "username": "abhay",
+            "password": "abhay123",
+            "role": "cashier",
+        },
+    ]
+
+    for u in users:
+        if not User.query.filter_by(username=u["username"]).first():
+            db.session.add(
+                User(
+                    name=u["name"],
+                    username=u["username"],
+                    password_hash=generate_password_hash(u["password"]),
+                    role=u["role"],
+                )
+            )
+
+    db.session.commit()
+    print("Users created successfully.")
 
 @app.cli.command("create-user")
 @click.argument("username")
