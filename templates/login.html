@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+{% block title %}Inventory and Billing Management System | Enkays Foodland{% endblock %}
+
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --inv-green: #16794b;
+    --inv-green-dark: #105b38;
+    --inv-ink: #172b23;
+    --inv-muted: #68766f;
+    --inv-border: #e0e9e3;
+    --inv-bg: #f3f7f4;
+  }
+
+  body {
+    background: var(--inv-bg);
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .enkays-login-page {
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 16px;
+    color: var(--inv-ink);
+  }
+
+  .enkays-login-shell {
+    width: 100%;
+    max-width: 980px;
+    min-height: 560px;
+    display: grid;
+    grid-template-columns: 1fr 0.92fr;
+    overflow: hidden;
+    border: 1px solid #e3ebe5;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(25, 55, 38, 0.11);
+  }
+
+  .enkays-brand-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 38px;
+    color: #fff;
+    background:
+      radial-gradient(circle at 12% 15%, rgba(255,255,255,.13), transparent 26%),
+      radial-gradient(circle at 90% 85%, rgba(255,255,255,.10), transparent 28%),
+      linear-gradient(145deg, #176f47 0%, #104d35 100%);
+    overflow: hidden;
+  }
+
+  .enkays-brand-panel::after {
+    content: "";
+    position: absolute;
+    width: 310px;
+    height: 310px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 50%;
+    right: -135px;
+    top: 180px;
+    box-shadow: 0 0 0 35px rgba(255,255,255,.035), 0 0 0 70px rgba(255,255,255,.025);
+    pointer-events: none;
+  }
+
+  .enkays-brand-top, .enkays-brand-copy, .enkays-brand-footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  .enkays-brand-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .enkays-logo {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    color: var(--inv-green-dark);
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(0,0,0,.12);
+    flex: 0 0 auto;
+  }
+
+  .enkays-logo svg { width: 27px; height: 27px; }
+
+  .enkays-brand-name {
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: -.025em;
+  }
+
+  .enkays-brand-subtitle {
+    margin-top: 3px;
+    font-size: .74rem;
+    color: rgba(255,255,255,.76);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .enkays-brand-copy { margin: 60px 0 50px; }
+
+  .enkays-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 999px;
+    background: rgba(255,255,255,.09);
+    color: #e8fff1;
+    font-size: .73rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .enkays-brand-copy h1 {
+    margin: 22px 0 14px;
+    color: #fff;
+    font-size: clamp(2rem, 4vw, 2.85rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.055em;
+  }
+
+  .enkays-brand-copy p {
+    max-width: 380px;
+    margin: 0;
+    color: rgba(255,255,255,.8);
+    font-size: .98rem;
+    line-height: 1.75;
+  }
+
+  .enkays-feature-list {
+    display: grid;
+    gap: 13px;
+    margin-top: 28px;
+  }
+
+  .enkays-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #f2fff6;
+    font-size: .88rem;
+    font-weight: 500;
+  }
+
+  .enkays-feature-check {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border-radius: 8px;
+    color: #fff;
+    background: rgba(255,255,255,.16);
+    font-size: .8rem;
+  }
+
+  .enkays-brand-footer {
+    color: rgba(255,255,255,.64);
+    font-size: .75rem;
+  }
+
+  .enkays-form-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 44px;
+  }
+
+  .enkays-form-mark {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 25px;
+    border-radius: 15px;
+    color: var(--inv-green);
+    background: #eaf6ee;
+  }
+
+  .enkays-form-mark svg { width: 25px; height: 25px; }
+
+  .enkays-form-kicker {
+    margin-bottom: 8px;
+    color: var(--inv-green);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+
+  .enkays-form-panel h2 {
+    margin: 0;
+    color: var(--inv-ink);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -.045em;
+  }
+
+  .enkays-form-intro {
+    margin: 10px 0 28px;
+    color: var(--inv-muted);
+    font-size: .9rem;
+    line-height: 1.6;
+  }
+
+  .enkays-alert {
+    padding: 12px 14px;
+    margin: 0 0 18px;
+    border: 1px solid #f2c7c7;
+    border-radius: 12px;
+    background: #fff2f2;
+    color: #9d2929;
+    font-size: .84rem;
+  }
+
+  .enkays-field { margin-bottom: 19px; }
+
+  .enkays-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34483d;
+    font-size: .82rem;
+    font-weight: 700;
+  }
+
+  .enkays-input-wrap { position: relative; }
+
+  .enkays-input-wrap svg {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    width: 19px;
+    height: 19px;
+    transform: translateY(-50%);
+    color: #829188;
+    pointer-events: none;
+  }
+
+  .enkays-field input {
+    display: block;
+    width: 100%;
+    min-height: 51px;
+    box-sizing: border-box;
+    padding: 13px 14px 13px 44px;
+    border: 1px solid var(--inv-border);
+    border-radius: 12px;
+    outline: none;
+    background: #fbfdfb;
+    color: var(--inv-ink);
+    font: inherit;
+    font-size: .91rem;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+
+  .enkays-field input::placeholder { color: #a1ada5; }
+
+  .enkays-field input:focus {
+    border-color: #4b9c70;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(22,121,75,.10);
+  }
+
+  .enkays-login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 8px;
+    padding: 13px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #198653, #12663f);
+    color: #fff;
+    font: inherit;
+    font-size: .94rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 9px 18px rgba(22,121,75,.19);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .enkays-login-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(22,121,75,.25);
+  }
+
+  .enkays-login-button svg { width: 18px; height: 18px; }
+
+  .enkays-secure-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 24px;
+    color: #7c8981;
+    font-size: .75rem;
+    text-align: center;
+  }
+
+  .enkays-secure-note svg { width: 15px; height: 15px; }
+
+  @media (max-width: 760px) {
+    .enkays-login-page { min-height: auto; padding: 18px 10px 28px; }
+    .enkays-login-shell {
+      max-width: 470px;
+      min-height: 0;
+      grid-template-columns: 1fr;
+      border-radius: 20px;
+    }
+    .enkays-brand-panel { padding: 25px 24px 22px; }
+    .enkays-brand-copy { margin: 30px 0 26px; }
+    .enkays-brand-copy h1 { margin-top: 16px; font-size: 2rem; }
+    .enkays-brand-copy p { font-size: .88rem; }
+    .enkays-feature-list { grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+    .enkays-brand-footer { margin-top: 10px; }
+    .enkays-form-panel { padding: 30px 24px 28px; }
+    .enkays-form-mark { margin-bottom: 18px; }
+    .enkays-form-panel h2 { font-size: 1.75rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .enkays-field input, .enkays-login-button { transition: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="enkays-login-page">
+  <section class="enkays-login-shell" aria-label="Enkays Foodland login">
+    <aside class="enkays-brand-panel">
+      <div class="enkays-brand-top">
+        <div class="enkays-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 4h2l2.1 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H6"/>
+            <circle cx="10" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/>
+            <path d="M9 8V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5V8"/>
+          </svg>
+        </div>
+        <div>
+          <div class="enkays-brand-name">Enkays Foodland</div>
+          <div class="enkays-brand-subtitle">Inventory &amp; Billing</div>
+        </div>
+      </div>
+
+      <div class="enkays-brand-copy">
+        <span class="enkays-eyebrow"><span aria-hidden="true">●</span> Store management portal</span>
+        <h1>Everything in stock.<br>Every sale in order.</h1>
+        <p>Manage products, monitor stock, create customer bills and keep your store operations organized in one place.</p>
+        <div class="enkays-feature-list">
+          <div class="enkays-feature"><span class="enkays-feature-check">✓</span> Real-time inventory overview</div>
+          <div class="enkays-feature"><span class="enkays-feature-check">✓</span> Fast point-of-sale billing</div>
+          <div class="enkays-feature"><span class="enkays-feature-check">✓</span> Sales records and PDF invoices</div>
+        </div>
+      </div>
+
+      <div class="enkays-brand-footer">Inventory and Billing Management System</div>
+    </aside>
+
+    <div class="enkays-form-panel">
+      <div class="enkays-form-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2"/>
+          <path d="M3 9h18M8 4v5m8-5v5M7 13h3m4 0h3M7 16h3"/>
+        </svg>
+      </div>
+      <div class="enkays-form-kicker">Welcome back</div>
+      <h2>Sign in to continue</h2>
+      <p class="enkays-form-intro">Enter your authorized account details to access the store dashboard.</p>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="enkays-alert" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="enkays-field">
+          <label for="username">Username</label>
+          <div class="enkays-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+            </svg>
+            <input id="username" type="text" name="username" placeholder="Enter your username" autocomplete="username" required autofocus>
+          </div>
+        </div>
+
+        <div class="enkays-field">
+          <label for="password">Password</label>
+          <div class="enkays-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/><path d="M12 14v3"/>
+            </svg>
+            <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <button class="enkays-login-button" type="submit">
+          Sign in securely
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="enkays-secure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>
+        </svg>
+        Authorized access only
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
