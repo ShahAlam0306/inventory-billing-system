@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Invoice #{{ bill.id }} | Enkays Foodland</title>
+
+    <style>
+        :root {
+            --green: #176b4d;
+            --dark-green: #123d2d;
+            --light-green: #eef7f1;
+            --border: #dce7df;
+            --text: #24372d;
+            --muted: #718078;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px 12px;
+            background: #edf2ee;
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        .invoice {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 36px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(20, 50, 30, 0.08);
+        }
+
+        .top-line {
+            height: 6px;
+            background: var(--green);
+            border-radius: 10px;
+            margin-bottom: 28px;
+        }
+
+        .store-header {
+            text-align: center;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .store-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            background: var(--light-green);
+            font-size: 26px;
+        }
+
+        .store-header h1 {
+            margin: 0;
+            color: var(--dark-green);
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .store-header p {
+            margin: 7px 0 0;
+            color: var(--muted);
+        }
+
+        .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin: 26px 0;
+        }
+
+        .invoice-info h2 {
+            margin: 0 0 12px;
+            color: var(--green);
+            font-size: 19px;
+        }
+
+        .info-line {
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .invoice-number {
+            text-align: right;
+            color: var(--muted);
+        }
+
+        .invoice-number strong {
+            display: block;
+            margin-top: 6px;
+            color: var(--dark-green);
+            font-size: 22px;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        thead {
+            background: var(--light-green);
+        }
+
+        th {
+            padding: 13px 10px;
+            color: var(--green);
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--border);
+            overflow-wrap: anywhere;
+        }
+
+        .number {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .total-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .total-box {
+            width: 270px;
+            padding: 18px;
+            border-radius: 12px;
+            background: var(--light-green);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .total-row span {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .total-row strong {
+            color: var(--green);
+            font-size: 23px;
+        }
+
+        .thank-you {
+            margin-top: 34px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .thank-you strong {
+            color: var(--green);
+        }
+
+        .actions {
+            max-width: 800px;
+            margin: 16px auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 9px;
+            background: var(--green);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--green);
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 10px 6px;
+            }
+
+            .invoice {
+                padding: 22px 13px;
+                border-radius: 10px;
+            }
+
+            .store-header h1 {
+                font-size: 25px;
+            }
+
+            .invoice-info {
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .invoice-number {
+                text-align: left;
+            }
+
+            th, td {
+                padding: 11px 7px;
+                font-size: 12px;
+            }
+
+            .total-box {
+                width: 100%;
+            }
+
+            .actions {
+                padding: 0 4px;
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .invoice {
+                max-width: none;
+                padding: 15px;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .actions {
+                display: none;
+            }
+
+            .top-line,
+            thead,
+            .total-box,
+            .store-icon {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            @page {
+                size: A4;
+                margin: 12mm;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="invoice">
+
+    <div class="top-line"></div>
+
+    <header class="store-header">
+        <div class="store-icon">🛒</div>
+        <h1>Enkays Foodland</h1>
+        <p>Inventory and Billing Management System</p>
+    </header>
+
+    <section class="invoice-info">
+
+        <div>
+            <h2>SALES INVOICE</h2>
+
+            <div class="info-line">
+                <strong>Invoice ID:</strong> #{{ bill.id }}
+            </div>
+
+            <div class="info-line">
+                <strong>Date:</strong>
+                {{ bill.date.strftime('%d %b %Y, %I:%M %p') }}
+            </div>
+
+            <div class="info-line">
+                <strong>Cashier:</strong>
+                {{ bill.cashier.name if bill.cashier else '—' }}
+            </div>
+        </div>
+
+        <div class="invoice-number">
+            INVOICE NUMBER
+            <strong>#{{ bill.id }}</strong>
+        </div>
+
+    </section>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="number">Qty</th>
+                    <th class="number">Price</th>
+                    <th class="number">Subtotal</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in bill.items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+
+                    <td class="number">
+                        {{ item.qty }}
+                    </td>
+
+                    <td class="number">
+                        ₹{{ "%.2f"|format(item.price_at_sale) }}
+                    </td>
+
+                    <td class="number">
+                        ₹{{ "%.2f"|format(item.subtotal) }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align:center;">
+                        No items found for this invoice.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <section class="total-area">
+        <div class="total-box">
+            <div class="total-row">
+                <span>Grand Total</span>
+                <strong>
+                    ₹{{ "%.2f"|format(bill.total_amount) }}
+                </strong>
+            </div>
+        </div>
+    </section>
+
+    <footer class="thank-you">
+        <strong>Thank you for shopping with Enkays Foodland!</strong>
+        <br>
+        We appreciate your business. Please visit us again.
+    </footer>
+
+</main>
+
+<div class="actions">
+    <button class="btn btn-secondary"
+            type="button"
+            onclick="window.history.back()">
+        Back
+    </button>
+
+    <button class="btn"
+            type="button"
+            onclick="window.print()">
+        Print / Save as PDF
+    </button>
+</div>
+
+</body>
+</html>
