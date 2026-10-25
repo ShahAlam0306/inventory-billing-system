@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Enkays Foodland{% endblock %}
+{% block head %}
+<style>
+.dash{--green:#176b4d;--dark:#17372b;--muted:#6b7c73}
+.dash .heading{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.dash .eyebrow{color:var(--green);font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.dash h1{font-weight:800;letter-spacing:-.04em;color:var(--dark);margin:5px 0}
+.dash .muted{color:var(--muted)}
+.dash .metric,.dash .panel{background:#fff;border:1px solid #e4ece6;border-radius:18px;box-shadow:0 5px 18px #183b2910}
+.dash .metric{padding:21px;height:100%;transition:transform .18s,box-shadow .18s}
+.dash .metric:hover{transform:translateY(-3px);box-shadow:0 12px 25px #183b2918}
+.dash .metric-label{color:var(--muted);font-weight:600}
+.dash .metric-icon{float:right;background:#eaf5ef;border-radius:12px;padding:9px}
+.dash .metric-value{font-size:2rem;font-weight:800;color:var(--dark);margin:14px 0 2px}
+.dash .panel{overflow:hidden;height:100%}
+.dash .panel-head{padding:20px;border-bottom:1px solid #edf1ee;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.dash h2{font-size:1.05rem;font-weight:800;color:var(--dark);margin:0}
+.dash .chart-area{padding:20px;height:300px}
+.dash .chart-area canvas{width:100%!important;height:100%!important}
+.dash .periods{display:flex;gap:5px;flex-wrap:wrap}
+.dash .periods .btn{border-radius:9px}
+.dash .periods .active{background:var(--green);border-color:var(--green);color:white}
+.dash .stock-alert{background:#fff8e9;border:1px solid #f2d9a5;border-radius:14px;padding:15px;margin-bottom:20px;color:#79551b}
+.dash .stock-chip{display:inline-block;background:#ffedc7;border-radius:20px;padding:3px 9px;margin:4px;font-size:.8rem;font-weight:700}
+.dash .quick{display:flex;gap:12px;align-items:center;padding:16px 18px;text-decoration:none;color:var(--dark);border-bottom:1px solid #edf1ee}
+.dash .quick:last-child{border:0}.dash .quick:hover{background:#f5faf6}
+.dash .quick-icon{background:#eaf5ef;border-radius:12px;padding:10px}
+.dash .quick strong{display:block}.dash .quick small{color:var(--muted)}
+@media(max-width:575px){.dash .metric{padding:16px}.dash .chart-area{height:250px;padding:14px}.dash .panel-head{padding:16px}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dash" id="dashboardRoot"
+ data-sales-url-daily="{{ url_for('sales_last_7_days') }}"
+ data-sales-url-weekly="{{ url_for('sales_weekly') }}"
+ data-sales-url-monthly="{{ url_for('sales_monthly') }}">
+ <header class="heading"><div><div class="eyebrow">Enkays Foodland · Store overview</div><h1>Dashboard</h1><div class="muted">A clear view of your sales and stock performance.</div></div></header>
+ {% if low_stock %}<div class="stock-alert"><strong>⚠ Low stock attention needed</strong><div>{% for p in low_stock %}<span class="stock-chip">{{ p.name }} · {{ p.stock_qty }} left</span>{% endfor %}</div></div>{% endif %}
+ <div class="row g-3 mb-4">
+  <div class="col-12 col-md-4"><section class="metric"><span class="metric-label">Today's Sales</span><span class="metric-icon">₹</span><div class="metric-value">₹{{ "%.2f"|format(today_total) }}</div><small class="muted">Total value of today's bills</small></section></div>
+  <div class="col-12 col-md-4"><section class="metric"><span class="metric-label">Bills Today</span><span class="metric-icon">🧾</span><div class="metric-value">{{ today_count }}</div><small class="muted">Transactions completed today</small></section></div>
+  <div class="col-12 col-md-4"><section class="metric"><span class="metric-label">Low Stock Items</span><span class="metric-icon">📦</span><div class="metric-value">{{ low_stock|length }}</div><small class="muted">{{ 'Items need restocking' if low_stock else 'Stock levels look good' }}</small></section></div>
+ </div>
+ <div class="row g-3">
+  <div class="col-12 col-lg-8"><section class="panel">
+   <div class="panel-head"><div><h2 id="salesCardTitle">Sales — last 7 days</h2><small class="muted">Compare performance by period</small></div>
+    <div class="periods" id="periodButtons"><button class="btn btn-outline-success btn-sm active" data-period="daily" type="button">Daily</button><button class="btn btn-outline-success btn-sm" data-period="weekly" type="button">Weekly</button><button class="btn btn-outline-success btn-sm" data-period="monthly" type="button">Monthly</button></div>
+   </div><div class="chart-area"><canvas id="salesChart"></canvas><p id="salesChartMessage" class="muted small mt-2" role="status"></p></div>
+  </section></div>
+  <div class="col-12 col-lg-4"><section class="panel"><div class="panel-head"><div><h2>Quick actions</h2><small class="muted">Common store tasks</small></div></div>
+   <a class="quick" href="{{ url_for('billing') }}"><span class="quick-icon">🛒</span><span><strong>Create a bill</strong><small>Start customer checkout</small></span></a>
+   <a class="quick" href="{{ url_for('inventory') }}"><span class="quick-icon">📦</span><span><strong>Manage inventory</strong><small>Review products and stock</small></span></a>
+   <a class="quick" href="{{ url_for('bills') }}"><span class="quick-icon">📑</span><span><strong>Sales history</strong><small>Open previous bills</small></span></a>
+  </section></div>
+ </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
