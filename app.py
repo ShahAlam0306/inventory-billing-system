@@ -516,7 +516,7 @@ BRAND_DARK = colors.HexColor("#7a3b2e")
 BRAND_LIGHT = colors.HexColor("#f4ece3")
 TEXT_GRAY = colors.HexColor("#555555")
 
-SHOP_NAME = "S.S.A. General Store"
+SHOP_NAME = "ENKAY'S FOODLAND"
 SHOP_TAGLINE = "Your neighbourhood shop, done digitally"
 
 
